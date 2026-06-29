@@ -1,0 +1,65 @@
+# ==========================
+# Streamlit
+# ==========================
+streamlit>=1.40.0
+
+# ==========================
+# LangChain
+# ==========================
+langchain>=0.2.0
+langchain-core>=0.2.0
+langchain-community>=0.2.0
+langchain-text-splitters>=0.2.0
+langchain-mistralai>=0.2.0
+langchain-huggingface>=0.1.0
+langchain-chroma>=0.1.0
+
+# ==========================
+# LLM
+# ==========================
+mistralai>=1.0.0
+
+# ==========================
+# Vector Database
+# ==========================
+chromadb>=0.5.0
+
+# ==========================
+# Embeddings
+# ==========================
+sentence-transformers>=3.0.0
+transformers>=4.40.0
+huggingface-hub>=0.23.0
+
+# ==========================
+# PDF Processing
+# ==========================
+pypdf>=4.2.0
+
+# ==========================
+# Search
+# ==========================
+tavily-python>=0.3.0
+
+# ==========================
+# Web Scraping
+# ==========================
+beautifulsoup4>=4.12.0
+requests>=2.31.0
+lxml>=5.0.0
+html5lib>=1.1
+
+# ==========================
+# Environment Variables
+# ==========================
+python-dotenv>=1.0.0
+
+# ==========================
+# Utilities
+# ==========================
+pydantic>=2.5.0
+tiktoken>=0.6.0
+tenacity>=8.2.0
+orjson>=3.9.0
+aiohttp>=3.9.0
+rich>=13.7.0
