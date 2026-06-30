@@ -1,5 +1,15 @@
 import os
 import streamlit as st
+from pipeline import run_research_pipeline
+from agents import (
+build_search_agent,
+build_reader_agent,
+writer_chain,
+critic_chain,
+)
+
+if "is_running" not in st.session_state:
+    st.session_state.is_running = False
 
 
 st.set_page_config(
@@ -365,11 +375,19 @@ if st.session_state.active_agent == "research":
             placeholder="e.g.  Quantum computing breakthroughs in 2025",
             label_visibility="collapsed",
         )
+    # with btn_col:
+    #     run_clicked = st.button("Run Pipeline", use_container_width=True, key="run_pipeline")
     with btn_col:
-        run_clicked = st.button("Run Pipeline", use_container_width=True, key="run_pipeline")
+        run_clicked = st.button(
+            "Run Pipeline",
+            use_container_width=True,
+            key="run_pipeline",
+            disabled=st.session_state.is_running
+        )
 
     # ── Pipeline execution ────────────────────────────────────────────────────
     if run_clicked:
+        st.session_state.is_running = True
         if not topic.strip():
             st.markdown('<div class="error-banner">⚠️  Please enter a research topic before running the pipeline.</div>', unsafe_allow_html=True)
         else:
@@ -383,13 +401,13 @@ if st.session_state.active_agent == "research":
 
             try:
                 # ── Import backend (deferred to avoid import errors on UI-only runs) ──
-                from pipeline import run_research_pipeline
-                from agents import (
-                    build_search_agent,
-                    build_reader_agent,
-                    writer_chain,
-                    critic_chain,
-                )
+                # from pipeline import run_research_pipeline
+                # from agents import (
+                #     build_search_agent,
+                #     build_reader_agent,
+                #     writer_chain,
+                #     critic_chain,
+                # )
 
                 progress_placeholder = st.empty()
                 status_placeholder = st.empty()
@@ -447,8 +465,10 @@ if st.session_state.active_agent == "research":
                 st.session_state.pipeline_stage = 5
                 progress_placeholder.markdown(render_pipeline(5), unsafe_allow_html=True)
                 status_placeholder.empty()
+                st.session_state.is_running = False
 
             except Exception as e:
+                st.session_state.is_running = False
                 st.session_state.pipeline_error = str(e)
                 st.session_state.pipeline_stage = 0
 
@@ -504,20 +524,51 @@ if st.session_state.active_agent == "research":
 
     elif st.session_state.pipeline_stage == 0 and not st.session_state.pipeline_error:
         # Idle placeholder
-        st.markdown(
-            """
-            <div style="text-align:center;padding:3rem 1rem;color:#3a3a58;">
-                <div style="font-size:2.8rem;margin-bottom:0.8rem">🌐</div>
-                <div style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:600;color:#4a4a6a">
-                    Ready to research
+        # st.markdown(
+        #     """
+        #     <div style="text-align:center;padding:3rem 1rem;color:#3a3a58;">
+        #         <div style="font-size:2.8rem;margin-bottom:0.8rem">🌐</div>
+        #         <div style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:600;color:#4a4a6a">
+        #             Ready to research
+        #         </div>
+        #         <div style="font-size:0.85rem;margin-top:0.4rem">
+        #             Enter a topic above and hit <strong style="color:#ff7a30">Run Pipeline</strong> to start.
+        #         </div>
+        #     </div>
+        #     """,
+        #     unsafe_allow_html=True,
+        # )
+
+        if not st.session_state.is_running:
+            st.markdown(
+                """
+                <div style="text-align:center;padding:3rem 1rem;color:#3a3a58;">
+                    <div style="font-size:2.8rem;margin-bottom:0.8rem">🌐</div>
+                    <div style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:600;color:#4a4a6a">
+                        Ready to research
+                    </div>
+                    <div style="font-size:0.85rem;margin-top:0.4rem">
+                        Enter a topic above and hit <strong style="color:#ff7a30">Run Pipeline</strong> to start.
+                    </div>
                 </div>
-                <div style="font-size:0.85rem;margin-top:0.4rem">
-                    Enter a topic above and hit <strong style="color:#ff7a30">Run Pipeline</strong> to start.
+                """,
+                unsafe_allow_html=True,
+            )
+        else:
+            st.markdown(
+                """
+                <div style="text-align:center;padding:3rem 1rem;color:#3a3a58;">
+                    <div style="font-size:2.8rem;margin-bottom:0.8rem">⏳</div>
+                    <div style="font-family:'Space Grotesk',sans-serif;font-size:1.1rem;font-weight:600;color:#4a4a6a">
+                        Research in Progress
+                    </div>
+                    <div style="font-size:0.85rem;margin-top:0.4rem">
+                        Please wait while the agents are searching, reading and generating your report...
+                    </div>
                 </div>
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+                """,
+                unsafe_allow_html=True,
+            )
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  DOCUMENT INTELLIGENCE (RAG) PAGE
